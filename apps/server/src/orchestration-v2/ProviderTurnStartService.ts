@@ -61,12 +61,17 @@ import {
   historicalMessage,
   latestNativeContextUsage,
 } from "@t3tools/provider-core/server/handoffBudget";
+<<<<<<< HEAD
 import {
   deliverContextHandoffs,
   isSlashCommandMessage,
   withInlineContext,
 } from "./ContextHandoffDelivery.ts";
 import { isProviderCommand, outputInstructions } from "./runOutput.ts";
+=======
+import { deliverContextHandoffs, withInlineContext } from "./ContextHandoffDelivery.ts";
+import { formatAgentRoleCatalog } from "@t3tools/shared/agentRoleInstructions";
+>>>>>>> 5283e5189c (feat(roles): port standalone model roles onto Nightly 20261109.4443)
 import * as ProviderAdapter from "@t3tools/provider-core/server/ProviderAdapter";
 import * as IdAllocator from "@t3tools/provider-core/server/IdAllocator";
 import * as ProjectionStore from "./ProjectionStore.ts";
@@ -305,6 +310,7 @@ export const layer: Layer.Layer<
     const runtimePolicy = yield* RuntimePolicy.RuntimePolicyV2;
     const restoreMissingWorktree = yield* makeRestoreMissingWorktree;
     const turnItemPositions = yield* TurnItemPositionStore.TurnItemPositionStoreV2;
+    const serverSettings = yield* ServerSettings.ServerSettingsService;
 
     // Build draining callbacks outside startup scope so they cannot retain full thread history.
     const makeRunControls = (input: {
@@ -1030,11 +1036,22 @@ export const layer: Layer.Layer<
         session.driver === "claudeAgent" ||
         session.providerSession.capabilities.turns.supportsNativeGoals === true;
       const goalCommand = goalDriver && parseGoalCommand(providerMessage) !== null;
+<<<<<<< HEAD
       // Part of the user text, so every way a turn starts carries it, after the user's own words.
       const userText =
         run.outputSchema === undefined || goalCommand || isProviderCommand(providerMessage)
           ? messageText
           : `${messageText}\n\n${outputInstructions(run.outputSchema)}`;
+=======
+      // Every provider turn sees this project's compact role catalog. A project
+      // with no role policy gets none, which preserves the native-subagent shape.
+      const roleCatalog = yield* serverSettings.getSettings.pipe(
+        Effect.map((settings) =>
+          formatAgentRoleCatalog({ settings, projectId: projection.thread.projectId }),
+        ),
+        Effect.orElseSucceed(() => null),
+      );
+>>>>>>> 5283e5189c (feat(roles): port standalone model roles onto Nightly 20261109.4443)
       // The provider turn marks cancellation work delivered; restart continuations use their own text or resume natively.
       const noteContinuation = isRestartNoteContinuation(
         run,
@@ -2126,6 +2143,7 @@ export const layer: Layer.Layer<
             sideChatHandoff === undefined || compact || slashCommand
               ? ""
               : sideChatHandoff.summaryText;
+<<<<<<< HEAD
           // Record inline handoffs before startTurn so an immediate dropped terminal can restore them.
           inlineDeliveredHandoffs = [
             ...delivery.inlineHandoffs.map((handoff) =>
@@ -2136,6 +2154,9 @@ export const layer: Layer.Layer<
             ...(sideChatContext === "" || sideChatHandoff === undefined ? [] : [sideChatHandoff]),
           ];
           const context = [delivery.context, sideChatContext, restartNote]
+=======
+          const context = [delivery.context, sideChatContext, restartNote, roleCatalog ?? ""]
+>>>>>>> 5283e5189c (feat(roles): port standalone model roles onto Nightly 20261109.4443)
             .filter((part) => part !== "")
             .join("\n\n");
           const { restartContinuationOfRunId: _resumedRunId, ...promptedInput } = turnInput;
@@ -2238,9 +2259,22 @@ export const layer: Layer.Layer<
               }),
         ),
       );
+<<<<<<< HEAD
       const deliverySession = carriesPendingContext
         ? makeDeliverySession(session, startWithHandoffs)
         : session;
+=======
+      const deliverySession =
+        effectiveHandoffs.length === 0 &&
+        retryHandoff.handoffs.length === 0 &&
+        retryHandoff.attachments.length === 0 &&
+        sideChatHandoff === undefined &&
+        restartNote === "" &&
+        !noteContinuation &&
+        roleCatalog === null
+          ? session
+          : makeDeliverySession(session, startWithHandoffs);
+>>>>>>> 5283e5189c (feat(roles): port standalone model roles onto Nightly 20261109.4443)
       return runExecution.startRootRun({
         commandId: CommandId.make(`command:effect:provider-turn.start:${run.id}`),
         appThread: projection.thread,
