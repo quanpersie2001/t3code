@@ -1359,12 +1359,8 @@ function makeLocalCommandHarness(input: {
         }),
         IdAllocator.layer,
         Layer.mock(TurnItemPositionStore.TurnItemPositionStoreV2)({}),
-<<<<<<< HEAD
-        layerWorktreeLocation(input.worktreesDir),
-        layerNoTaskFolders,
-=======
         layerWorktreeLocation(input.worktreesDir, input.settings),
->>>>>>> 5283e5189c (feat(roles): port standalone model roles onto Nightly 20261109.4443)
+        layerNoTaskFolders,
         input.fileSystem === undefined
           ? FileSystem.layerNoop({ exists: () => Effect.succeed(true) })
           : Layer.succeed(FileSystem.FileSystem, input.fileSystem),

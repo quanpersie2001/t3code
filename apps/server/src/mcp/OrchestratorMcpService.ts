@@ -1796,15 +1796,6 @@ const make = Effect.gen(function* () {
       instanceId === inheritedSelection.instanceId &&
       (advertised?.slug ?? model) ===
         (advertisedModel(provider, inheritedSelection.model)?.slug ?? inheritedSelection.model);
-<<<<<<< HEAD
-    let options = inheritsOptions
-      ? knownOptions(
-          withLegacyUltracodeEffort(descriptors, inheritedSelection.options),
-          descriptors,
-        )
-      : undefined;
-    if (requestedOptions !== undefined || antigravityTarget !== undefined) {
-=======
     let options =
       baselineOptions !== undefined
         ? knownOptions(baselineOptions, descriptors)
@@ -1814,8 +1805,8 @@ const make = Effect.gen(function* () {
               descriptors,
             )
           : undefined;
-    if (requestedOptions !== undefined) {
->>>>>>> 5283e5189c (feat(roles): port standalone model roles onto Nightly 20261109.4443)
+    if (requestedOptions !== undefined || antigravityTarget !== undefined) {
+
       const selections = new Map(
         (requestedOptions?.length === 0 ? [] : (options ?? [])).map((selection) => [
           selection.id,
@@ -3049,11 +3040,9 @@ const make = Effect.gen(function* () {
         parent,
         target: roleTarget,
         providers,
-<<<<<<< HEAD
         cwd: yield* parentWorkspaceCwd(parent),
-=======
         ...(optionBaseline === undefined ? {} : { optionBaseline }),
->>>>>>> 5283e5189c (feat(roles): port standalone model roles onto Nightly 20261109.4443)
+
         skipProjectEnablementFilter: isRetryOfAcceptedDelegation,
       });
       const runtimeMode = yield* resolveRuntimeMode(
@@ -3095,7 +3084,6 @@ const make = Effect.gen(function* () {
         }
         workspaceStrategy = { type: "worktree", baseRef: base.commitSha, startFromOrigin: false };
       }
-<<<<<<< HEAD
       const parentNodeId = parentRun.rootNodeId;
       // The command commits the child's preparing run, which only this call
       // prepares, so a caller that goes away must not stop it in between.
@@ -3113,7 +3101,19 @@ const make = Effect.gen(function* () {
               parentThreadId: scope.thread.threadId,
               parentRunId: parentRun.id,
               parentNodeId,
-              task: taskPrompt(input),
+              task: taskPrompt(
+            input,
+            roleSettings === undefined || input.role === undefined
+              ? undefined
+              : formatAgentRoleInstruction(
+                  input.role,
+                  resolveAgentRoleInstruction({
+                    settings: roleSettings,
+                    projectId: parent.thread.projectId,
+                    role: input.role,
+                  }).text,
+                ),
+          ),
               ...(input.title === undefined ? {} : { title: input.title }),
               modelSelection: target.modelSelection,
               runtimeMode,
@@ -3166,56 +3166,6 @@ const make = Effect.gen(function* () {
             ? awaitTask(scope, taskId, key, input.timeoutMs, restore)
             : restore(readTask(scope, taskId, false, true));
         }),
-=======
-      // ThreadManagementService.dispatch is the chokepoint for this command
-      // type's own enablement check, using the same command id and its
-      // receipt-replay exemption, so no separate assert runs here.
-      const result = yield* threadManagement
-        .dispatch({
-          type: "delegated_task.request",
-          createdBy: "agent",
-          creationSource: "mcp",
-          commandId,
-          parentThreadId: scope.thread.threadId,
-          parentRunId: parentRun.id,
-          parentNodeId: parentRun.rootNodeId,
-          task: taskPrompt(
-            input,
-            roleSettings === undefined || input.role === undefined
-              ? undefined
-              : formatAgentRoleInstruction(
-                  input.role,
-                  resolveAgentRoleInstruction({
-                    settings: roleSettings,
-                    projectId: parent.thread.projectId,
-                    role: input.role,
-                  }).text,
-                ),
-          ),
-          ...(input.title === undefined ? {} : { title: input.title }),
-          modelSelection: target.modelSelection,
-          runtimeMode,
-          interactionMode,
-          ...(workspaceStrategy === undefined ? {} : { workspaceStrategy }),
-          // Async delegations wake the parent on every child terminal; wait
-          // delegations deliver through the blocking tool call until `awaitTask`
-          // gives up the wait (timeout, cancelled call) and upgrades the wake.
-          completionWake: input.mode === "wait" ? "settled_only" : "always",
-        })
-        .pipe(
-          Effect.mapError((error) =>
-            error._tag === "ThreadManagementProviderInstanceDisabledError"
-              ? threadManagementFailure(error)
-              : failure(
-                  "orchestration_error",
-                  `Unable to create delegated task: ${userFacingDispatchErrorMessage(error) ?? errorMessage(error)}`,
-                ),
-          ),
-        );
-      const taskEvent = result.storedEvents.find(
-        (stored) =>
-          stored.event.type === "subagent.updated" && stored.event.payload.origin === "app_owned",
->>>>>>> 5283e5189c (feat(roles): port standalone model roles onto Nightly 20261109.4443)
       );
     }),
     taskStatus: Effect.fn("OrchestratorMcpService.taskStatus")(function* (callerScope, taskId) {
