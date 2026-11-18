@@ -64,6 +64,7 @@ import {
 } from "../../composer-logic";
 import { type ChatMessage, DEFAULT_INTERACTION_MODE } from "../../types";
 import { recordPromptSent } from "../GitHubStarPrompt";
+import { recordRolesDiscussionPromptSent } from "../RolesDiscussion";
 import { stackedThreadToast, toastManager } from "../ui/toast";
 import { writeTextToClipboard } from "~/hooks/useCopyToClipboard";
 import { newMessageId, newThreadId } from "~/lib/utils";
@@ -1637,6 +1638,7 @@ export function useComposerSend(input: ComposerSendInput) {
           handleNewThreadInActiveProject();
         }
         void recordPromptSent(environmentId);
+        void recordRolesDiscussionPromptSent();
       }
     }
 
