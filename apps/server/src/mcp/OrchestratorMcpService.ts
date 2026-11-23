@@ -1806,7 +1806,6 @@ const make = Effect.gen(function* () {
             )
           : undefined;
     if (requestedOptions !== undefined || antigravityTarget !== undefined) {
-
       const selections = new Map(
         (requestedOptions?.length === 0 ? [] : (options ?? [])).map((selection) => [
           selection.id,
@@ -3102,18 +3101,18 @@ const make = Effect.gen(function* () {
               parentRunId: parentRun.id,
               parentNodeId,
               task: taskPrompt(
-            input,
-            roleSettings === undefined || input.role === undefined
-              ? undefined
-              : formatAgentRoleInstruction(
-                  input.role,
-                  resolveAgentRoleInstruction({
-                    settings: roleSettings,
-                    projectId: parent.thread.projectId,
-                    role: input.role,
-                  }).text,
-                ),
-          ),
+                input,
+                roleSettings === undefined || input.role === undefined
+                  ? undefined
+                  : formatAgentRoleInstruction(
+                      input.role,
+                      resolveAgentRoleInstruction({
+                        settings: roleSettings,
+                        projectId: parent.thread.projectId,
+                        role: input.role,
+                      }).text,
+                    ),
+              ),
               ...(input.title === undefined ? {} : { title: input.title }),
               modelSelection: target.modelSelection,
               runtimeMode,

@@ -16,7 +16,6 @@ import {
   type OrchestrationV2ThreadProjection,
   type OrchestrationV2TurnItem,
   isDeliveredProviderTurn,
-  isCompactionCommandMessage,
   isDelegatedAppThread,
   isListedThreadLineage,
   parseGoalCommand,
@@ -2259,9 +2258,10 @@ export const layer: Layer.Layer<
               }),
         ),
       );
-      const deliverySession = carriesPendingContext || roleCatalog !== null
-        ? makeDeliverySession(session, startWithHandoffs)
-        : session;
+      const deliverySession =
+        carriesPendingContext || roleCatalog !== null
+          ? makeDeliverySession(session, startWithHandoffs)
+          : session;
       return runExecution.startRootRun({
         commandId: CommandId.make(`command:effect:provider-turn.start:${run.id}`),
         appThread: projection.thread,

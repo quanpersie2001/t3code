@@ -1241,9 +1241,9 @@ const make = Effect.gen(function* () {
       failure: makeProviderFailure({
         cause,
         message:
-        input.projectId !== undefined && usesTrialWorkspace(input.projectId, threadId)
-          ? `${failureDetail(cause)} To use the original checkout, set this project's default workspace to Local in Settings, then retry.`
-          : failureDetail(cause),
+          input.projectId !== undefined && usesTrialWorkspace(input.projectId, threadId)
+            ? `${failureDetail(cause)} To use the original checkout, set this project's default workspace to Local in Settings, then retry.`
+            : failureDetail(cause),
         class: "validation_error",
         retryable: false,
       }),
